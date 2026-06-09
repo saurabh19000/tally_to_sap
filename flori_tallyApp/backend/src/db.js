@@ -1,33 +1,67 @@
 const { Pool } = require("pg");
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/tallyapp",
-  ssl: { rejectUnauthorized: false },
-});
+const connectionString = process.env.DATABASE_URL;
+
+let pool = null;
+let dbAvailable = false;
+
+function getPool() {
+  if (pool) return pool;
+  if (!connectionString) {
+    console.warn("[db] No DATABASE_URL in environment. Credentials will not persist.");
+    return null;
+  }
+  pool = new Pool({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+    max: 2,
+    connectionTimeoutMillis: 5000,
+    idleTimeoutMillis: 10000,
+  });
+  pool.on("error", function (err) {
+    console.error("[db] Unexpected pool error:", err.message);
+    dbAvailable = false;
+  });
+  return pool;
+}
 
 async function initDb() {
-  const client = await pool.connect();
+  const p = getPool();
+  if (!p) return;
   try {
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_credentials (
-        id SERIAL PRIMARY KEY,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        client_id TEXT NOT NULL,
-        client_secret TEXT NOT NULL,
-        token_url TEXT NOT NULL,
-        cpi_api_base TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      )
-    `);
-    console.log("[db] Database initialized (user_credentials table ready).");
-  } finally {
-    client.release();
+    const client = await p.connect();
+    try {
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS user_credentials (
+          id SERIAL PRIMARY KEY,
+          email VARCHAR(255) UNIQUE NOT NULL,
+          client_id TEXT NOT NULL,
+          client_secret TEXT NOT NULL,
+          token_url TEXT NOT NULL,
+          cpi_api_base TEXT NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        )
+      `);
+      dbAvailable = true;
+      console.log("[db] Database initialized (user_credentials table ready).");
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.warn("[db] Database unavailable:", err.message);
+    dbAvailable = false;
   }
 }
 
+function isAvailable() {
+  return dbAvailable;
+}
+
 async function saveCredentials(email, creds) {
-  const client = await pool.connect();
+  const p = getPool();
+  if (!p) throw new Error("Database not configured");
+  const client = await p.connect();
   try {
     await client.query(
       `INSERT INTO user_credentials (email, client_id, client_secret, token_url, cpi_api_base)
@@ -43,7 +77,9 @@ async function saveCredentials(email, creds) {
 }
 
 async function getCredentials(email) {
-  const client = await pool.connect();
+  const p = getPool();
+  if (!p) throw new Error("Database not configured");
+  const client = await p.connect();
   try {
     const result = await client.query(
       "SELECT client_id, client_secret, token_url, cpi_api_base FROM user_credentials WHERE email = $1",
@@ -62,4 +98,4 @@ async function getCredentials(email) {
   }
 }
 
-module.exports = { initDb, saveCredentials, getCredentials, pool };
+module.exports = { initDb, saveCredentials, getCredentials, isAvailable };
