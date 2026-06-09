@@ -266,7 +266,7 @@ async function main() {
             if (currentPage < totalPages - 1) promptMsg += `, [N]ext`;
             if (currentPage > 0) promptMsg += `, [P]revious`;
           }
-          promptMsg += `, or [C]ancel: `;
+          promptMsg += `, [A]ll, or [C]ancel: `;
 
           const compChoice = (await askQuestion(promptMsg)).trim().toLowerCase();
 
@@ -277,6 +277,30 @@ async function main() {
             continue;
           } else if (compChoice === 'p' && currentPage > 0) {
             currentPage--;
+            continue;
+          } else if (compChoice === 'a') {
+            const confirm = (await askQuestion(`\nPush data for ALL ${companies.length} companies? (y/N): `)).trim().toLowerCase();
+            if (confirm !== 'y') {
+              console.log('Cancelled.');
+              continue;
+            }
+            for (const company of companies) {
+              const name = val(company.NAME);
+              console.log(`\n--- Processing: ${name} ---`);
+              try {
+                const data = await fetchAllDetailedData(name);
+                if (data) {
+                  const total = data.ledgers.length + data.vouchers.length + data.stockItems.length;
+                  console.log(`Fetched ${total} records: ${data.ledgers.length} ledgers, ${data.vouchers.length} vouchers, ${data.stockItems.length} stock items`);
+                  console.log('Syncing...');
+                  await pushAllToBtpMethod(data.ledgers, data.vouchers, data.stockItems, data.company, config.btp);
+                  console.log(`✓ Successfully pushed ${name}\n`);
+                }
+              } catch (e) {
+                console.error(`✗ Failed for ${name}: ${e.message}\n`);
+              }
+            }
+            console.log('All companies processed!');
             continue;
           }
 
