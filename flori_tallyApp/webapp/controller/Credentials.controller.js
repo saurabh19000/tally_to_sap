@@ -14,18 +14,19 @@ sap.ui.define([
                 UIComponent.getRouterFor(this).navTo("Login", {}, true);
                 return;
             }
+            this._prefilled = false;
             this._updateSaveButton();
             var that = this;
             fetch("/api/auth/credentials?token=" + encodeURIComponent(token))
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     if (data.configured) {
+                        that._prefilled = true;
                         that.byId("clientIdInput").setValue(data.clientId || "");
                         that.byId("clientSecretInput").setValue(data.clientSecret || "");
                         that.byId("tokenUrlInput").setValue(data.tokenUrl || "");
                         that.byId("cpiBaseInput").setValue(data.cpiApiBase || "");
-                        that.byId("saveCredsBtn").setText("Update & Continue to Dashboard");
-                        MessageToast.show("Stored credentials loaded. You can update them below.");
+                        that.byId("saveCredsBtn").setText("Continue to Dashboard");
                     }
                     that._updateSaveButton();
                 })
@@ -99,6 +100,11 @@ sap.ui.define([
             if (!token) {
                 MessageBox.error("Session expired. Please login again.");
                 UIComponent.getRouterFor(this).navTo("Login", {}, true);
+                return;
+            }
+
+            if (this._prefilled) {
+                UIComponent.getRouterFor(this).navTo("RouteView1", {}, true);
                 return;
             }
 
