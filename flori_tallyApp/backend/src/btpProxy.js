@@ -31,6 +31,13 @@ function fetchToken(overrides) {
             return resolve(cachedToken);
         }
 
+        if (!tokenUrl) {
+            return reject(new Error("BTP Token URL not configured. Set it in BTP Settings."));
+        }
+        if (!clientId || !clientSecret) {
+            return reject(new Error("BTP credentials not configured. Set them in BTP Settings."));
+        }
+
         const auth = Buffer.from(clientId + ":" + clientSecret).toString("base64");
         const body = "grant_type=client_credentials";
         const url = new URL(tokenUrl);
@@ -89,6 +96,9 @@ function cpiRequest(
     overrides = null
 ) {
     const creds = resolveCreds(overrides);
+    if (!creds.cpiApiBase) {
+        return Promise.reject(new Error("BTP CPI API Base URL not configured. Set it in BTP Settings."));
+    }
     const cpiHost = new URL(creds.cpiApiBase).hostname;
 
     return fetchToken(overrides).then((token) => {
@@ -134,6 +144,9 @@ function cpiRequest(
 
 function pushToCpi(body, overrides = null) {
     const creds = resolveCreds(overrides);
+    if (!creds.cpiApiBase) {
+        return Promise.reject(new Error("BTP CPI API Base URL not configured. Set it in BTP Settings."));
+    }
     const cpiBase = creds.cpiApiBase;
 
     return fetchToken(overrides).then((token) => {
