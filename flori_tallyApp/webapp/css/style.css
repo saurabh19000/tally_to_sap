@@ -1,0 +1,21 @@
+.responsiveCard {
+    width: 100%;
+    max-width: 28rem;
+}
+
+.searchFieldResponsive {
+    width: 100%;
+    max-width: 22rem;
+}
+
+@media screen and (max-width: 480px) {
+    .responsiveCard {
+        max-width: 100%;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .searchFieldResponsive {
+        max-width: 100%;
+    }
+}

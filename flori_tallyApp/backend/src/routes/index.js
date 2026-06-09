@@ -1,0 +1,348 @@
+const { Router } = require("express");
+const http = require("http");
+const crypto = require("crypto");
+const istTimestamp = require("../helpers/istTimestamp");
+const { getGlobalCreds } = require("./auth");
+
+const TOKEN_PROXY = "localhost:3002";
+
+let dataVersions = [];
+let versionCounter = 0;
+
+function generateFingerprint(data) {
+    const content = JSON.stringify({
+        company: data.company,
+        type: data.dataType,
+        records: data.data ? data.data.length : 0,
+        firstRecord: data.data && data.data.length > 0 ? data.data[0] : null
+    });
+    return crypto.createHash("sha256").update(content).digest("hex").substring(0, 16);
+}
+
+function addVersion(data) {
+    try {
+        let rawData = [];
+        
+        // --- ADVANCED DATA NORMALIZATION (Handles nested "all" payloads) ---
+        if (Array.isArray(data)) {
+            rawData = data;
+        } else if (data && typeof data === "object") {
+            let innerData = data.data || data.value || data.entries || data.records;
+            
+            if (Array.isArray(innerData)) {
+                rawData = innerData;
+            } else if (innerData && typeof innerData === "object") {
+                // Flatten the nested structure (e.g., data: { ledgers: [], vouchers: [] })
+                let flattened = [];
+                if (Array.isArray(innerData.ledgers)) flattened = flattened.concat(innerData.ledgers);
+                if (Array.isArray(innerData.vouchers)) flattened = flattened.concat(innerData.vouchers);
+                if (Array.isArray(innerData.stockItems)) flattened = flattened.concat(innerData.stockItems);
+                
+                // If we successfully flattened arrays, use them. Otherwise, wrap the object.
+                rawData = flattened.length > 0 ? flattened : [innerData];
+            } else {
+                 rawData = [data]; // Fallback
+            }
+        }
+
+        let company = data.company || "";
+        if (!company && rawData.length > 0) {
+            for (let i = 0; i < Math.min(rawData.length, 5); i++) {
+                company = rawData[i].company || rawData[i].companyName || rawData[i].CompanyName || "";
+                if (company) break;
+            }
+        }
+        if (!company) company = dataVersions.length > 0 ? dataVersions[dataVersions.length - 1].company : "Unknown";
+
+        const dataType = data.dataType || "TallyData";
+        const syncId = data.syncId || data.cpiMessageId || ("hash-" + generateFingerprint({ company, dataType, data: rawData }));
+
+        const existing = dataVersions.find(v => v.syncId === syncId);
+        if (existing) {
+            console.log(`[backend] SKIP: Version with SyncID ${syncId} already exists.`);
+            return existing;
+        }
+
+        versionCounter++;
+        const summary = {
+            totalRecords: rawData.length,
+            totalLedgers: 0,
+            totalVouchers: 0,
+            totalStockItems: 0,
+            totalAmount: 0
+        };
+        
+        if (data.summary) {
+            Object.assign(summary, data.summary);
+            // Map BTP field names to our UI field names if needed
+            if (data.summary.ledgers !== undefined) summary.totalLedgers = data.summary.ledgers;
+            if (data.summary.vouchers !== undefined) summary.totalVouchers = data.summary.vouchers;
+            if (data.summary.stockItems !== undefined) summary.totalStockItems = data.summary.stockItems;
+        } 
+        
+        // Fallback: If counts are still 0 but we have a dataType that suggests otherwise
+        const typeLower = dataType.toLowerCase();
+        if (summary.totalLedgers === 0 && typeLower.includes("ledger")) summary.totalLedgers = rawData.length;
+        if (summary.totalVouchers === 0 && typeLower.includes("voucher")) summary.totalVouchers = rawData.length;
+        if (summary.totalStockItems === 0 && typeLower.includes("stock")) summary.totalStockItems = rawData.length;
+
+        if (!summary.totalAmount) {
+            try {
+                summary.totalAmount = rawData.reduce((sum, item) => sum + (parseFloat(item.netAmount || item.closingBalance || item.amount || 0)), 0);
+            } catch (e) {}
+        }
+
+        const version = {
+            id: versionCounter,
+            company: company,
+            dataType: dataType,
+            syncId: syncId,
+            cpiMessageId: data.cpiMessageId || (syncId.startsWith("hash-") ? null : syncId),
+            cpiDataStoreId: data.cpiDataStoreId || null,
+            cpiPushDate: data.cpiPushDate || new Date().toISOString(),
+            totalRecords: summary.totalRecords,
+            timestamp: data.cpiPushDate || data.timestamp || istTimestamp(), // PRIORITY FIX: Use BTP push date for absolute chronological accuracy
+            summary: summary,
+            data: rawData
+        };
+
+        dataVersions.push(version);
+        console.log(`[backend] COMMITTED: Version ${version.id} [${company}] - ${version.totalRecords} records.`);
+        return version;
+    } catch (err) {
+        console.error("[backend] INGESTION ERROR:", err.message);
+        return null;
+    }
+}
+
+function getCredHeaders() {
+    const creds = getGlobalCreds();
+    if (!creds) return {};
+    return {
+        "X-BTP-Client-ID": creds.clientId,
+        "X-BTP-Client-Secret": creds.clientSecret,
+        "X-BTP-Token-Url": creds.tokenUrl,
+        "X-BTP-CPI-Api-Base": creds.cpiApiBase,
+    };
+}
+
+function httpGetWithHeaders(url) {
+    return new Promise(function (resolve) {
+        const credHeaders = getCredHeaders();
+        const opts = new URL(url);
+        const req = http.request(
+            {
+                hostname: opts.hostname,
+                port: opts.port,
+                path: opts.pathname + opts.search,
+                method: "GET",
+                headers: credHeaders,
+            },
+            function (res) {
+                let data = "";
+                res.on("data", (chunk) => (data += chunk));
+                res.on("end", function () {
+                    resolve({ statusCode: res.statusCode, data: data });
+                });
+            }
+        );
+        req.on("error", (err) => resolve({ statusCode: 0, data: "", error: err.message }));
+        req.end();
+    });
+}
+
+function fetchFromCpi(dataStoreId) {
+    return new Promise(function (resolve) {
+        const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
+        httpGetWithHeaders(url).then(function (result) {
+            if (result.error || result.statusCode !== 200) return resolve({ data: [], error: result.error || "HTTP_" + result.statusCode });
+                try { resolve(JSON.parse(result.data || "{}")); } catch (e) { resolve({ data: [], error: "INVALID_JSON" }); }
+        });
+    });
+}
+
+function fetchFreshFromCpi(dataStoreId) {
+    return new Promise(function (resolve) {
+        const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
+        httpGetWithHeaders(url).then(function (result) {
+            const meta = { cpiMessageId: null, status: result.statusCode };
+            if (result.error || result.statusCode !== 200) return resolve({ meta, body: [], error: result.error || "HTTP_" + result.statusCode });
+            try { resolve({ meta, body: JSON.parse(result.data || "[]") }); } catch (e) { resolve({ meta, body: [], error: "JSON_PARSE_ERROR" }); }
+        });
+    });
+}
+
+const router = Router();
+
+router.get("/versions", (req, res) => res.json(dataVersions.map(v => ({ id: v.id, timestamp: v.timestamp, syncId: v.syncId, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords }))));
+router.get("/versions/:id", (req, res) => { const v = dataVersions.find(v => v.id === parseInt(req.params.id)); v ? res.json(v) : res.status(404).json({ error: "Not found" }); });
+
+function getLatestVersion(companyFilter) {
+    if (dataVersions.length === 0) return null;
+    let filtered = dataVersions;
+    if (companyFilter) {
+        filtered = dataVersions.filter(v => v.company === companyFilter);
+    }
+    if (filtered.length === 0) return null;
+    return filtered.slice().sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""))[0];
+}
+
+router.get("/http/read-tally", function (req, res) {
+    const company = req.query.company;
+    fetchFromCpi(null).then(data => {
+        if (data.error) return res.json(getLatestVersion(company) || { data: [] });
+        const v = addVersion(data);
+        res.json(v || getLatestVersion(company) || { data: [] });
+    });
+});
+
+router.post("/sync/btp-fetch", function (req, res) {
+    console.log("[debug-sync] Manual BTP Fetch triggered.");
+    fetchFreshFromCpi(null).then(function (result) {
+        if (result.error) return res.status(200).json({ success: false, error: "BTP Sync Exception", details: result.error });
+        const body = result.body;
+        const meta = result.meta;
+
+        console.log("[debug-sync] RAW DATA FROM BTP:", JSON.stringify(body, null, 2));
+
+        const items = Array.isArray(body) ? body : [body];
+        let addedCount = 0;
+        let skippedCount = 0;
+        items.forEach(item => {
+            const syncId = item.syncId || item.cpiMessageId || meta.cpiMessageId;
+            console.log("[debug-sync] Received ID from BTP:", syncId, "Company:", item.company);
+            const isDup = dataVersions.some(v => v.cpiMessageId === syncId || v.syncId === syncId);
+            if (!isDup && (Array.isArray(item) || (item && (item.data || item.company)))) {
+                if (addVersion(item)) addedCount++; else skippedCount++;
+            } else { skippedCount++; }
+        });
+        res.json({ success: true, status: "Verification Complete", totalAnalyzed: items.length, newVersions: addedCount, duplicatesSkipped: skippedCount, message: addedCount > 0 ? `Success: ${addedCount} documents verified and synced.` : "Verification complete: No new data found." });
+    }).catch(err => res.json({ success: false, error: "Global Sync Exception", details: err.message }));
+});
+
+router.get("/companies", (req, res) => {
+    const companies = [...new Set(dataVersions.map(v => v.company).filter(Boolean))];
+    res.json({ success: true, companies: companies });
+});
+
+router.post("/refresh", (req, res) => { const latest = getLatestVersion(req.query.company) || {}; res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords }); });
+
+router.get("/health", (_req, res) => { const latest = getLatestVersion(_req.query.company) || {}; res.json({ status: "ok", versions: dataVersions.length, lastSync: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords, company: latest.company }); });
+
+const odataRouter = Router();
+
+odataRouter.get("/v4/tally/Syncs", (req, res) => {
+    let filtered = dataVersions;
+    let companyFilter = req.query.company;
+
+    // Support OData $filter=company eq '...'
+    if (!companyFilter && req.query.$filter) {
+        const match = req.query.$filter.match(/company eq '(.*?)'/);
+        if (match) {
+            companyFilter = decodeURIComponent(match[1]);
+        }
+    }
+
+    if (companyFilter) {
+        filtered = dataVersions.filter(v => v.company === companyFilter);
+    }
+    const sorted = filtered.slice().sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+    const top = parseInt(req.query.$top, 10) || sorted.length;
+    res.json({ value: sorted.slice(0, top).map(v => {
+        const s = v.summary || {};
+        return { syncId: v.cpiMessageId || v.syncId || "—", versionId: v.id, company: v.company, dataType: v.dataType, totalRecords: v.totalRecords, cpiMessageId: v.cpiMessageId, pushedAt: v.timestamp, date: v.timestamp ? v.timestamp.split("T")[0] : null, totalLedgers: s.totalLedgers || 0, totalVouchers: s.totalVouchers || 0, totalAmount: s.totalAmount || 0 };
+    }) });
+});
+
+odataRouter.get("/v4/tally/Ledgers", (req, res) => {
+    let seen = {}; let ledgers = [];
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    console.log(`[odata] Fetching Ledgers for SyncID: ${targetSyncId}`);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        console.log(`[odata] Found ${targetVersions.length} versions matching SyncID`);
+
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "ledgers" && type !== "tallydata" && type !== "all") continue;
+            
+            (v.data || []).forEach((d, idx) => {
+                // Identify a Ledger by checking for properties unique to its structure.
+                const isLedger = d.parentGroup !== undefined || d.openingBalance !== undefined;
+                
+                if (isLedger) {
+                    // Robust deduplication key: use GUID or Name|Group, fallback to index to avoid merging unnamed records
+                    const key = d.guid || (d.name ? (d.name + "|" + (d.parentGroup || "")) : ("unnamed-" + idx));
+                    if (!seen[key]) { 
+                        seen[key] = true; 
+                        ledgers.push(Object.assign({}, d, { 
+                            syncId: v.cpiMessageId || v.syncId || "—", 
+                            syncDate: v.timestamp 
+                        })); 
+                    }
+                }
+            });
+        }
+    }
+    console.log(`[odata] Returning ${ledgers.length} ledgers`);
+    res.json({ value: ledgers.sort((a, b) => (a.name || "").localeCompare(b.name || "")) });
+});
+
+odataRouter.get("/v4/tally/Vouchers", (req, res) => {
+    let seen = {}; let vouchers = [];
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "vouchers" && type !== "tallydata" && type !== "all") continue;
+
+            (v.data || []).forEach(d => {
+                if (d.voucherDate || d.partyName || d.voucherNumber) {
+                    const key = d.guid || (d.voucherNumber + "|" + d.partyName);
+                    if (!seen[key]) { seen[key] = true; vouchers.push(Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp })); }
+                }
+            });
+        }
+    }
+    res.json({ value: vouchers.sort((a, b) => (b.voucherDate || "").localeCompare(a.voucherDate || "")) });
+});
+
+odataRouter.get("/v4/tally/StockItems", (req, res) => {
+    let seen = {}; let items = [];
+    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+
+    if (targetSyncId) {
+        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
+        for (let i = targetVersions.length - 1; i >= 0; i--) {
+            const v = targetVersions[i];
+            const type = (v.dataType || "").toLowerCase();
+            if (type !== "stock items" && type !== "tallydata" && type !== "all") continue;
+
+            (v.data || []).forEach(d => {
+                // Stock Items might use 'stockName' or just 'name'. 
+                // They are distinguished by 'group', 'category', 'baseUnit', or 'openingQty'.
+                const isStock = d.stockName || d.category || d.baseUnit || d.openingQty !== undefined || (d.name && d.group && !d.parentGroup);
+                
+                if (isStock) {
+                    const key = d.guid || d.stockName || d.name || JSON.stringify(d);
+                    if (!seen[key]) { 
+                        seen[key] = true; 
+                        // Map 'name' to 'stockName' if 'stockName' is missing for UI consistency
+                        const item = Object.assign({}, d, { syncId: v.cpiMessageId || v.syncId || "—", syncDate: v.timestamp });
+                        if (!item.stockName && item.name) item.stockName = item.name;
+                        items.push(item); 
+                    }
+                }
+            });
+        }
+    }
+    res.json({ value: items.sort((a, b) => (a.stockName || "").localeCompare(b.stockName || "")) });
+});
+
+module.exports = { router, odataRouter, addVersion, fetchFromCpi, fetchFreshFromCpi, dataVersions };

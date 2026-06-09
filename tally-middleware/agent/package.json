@@ -1,0 +1,22 @@
+{
+  "name": "middleware-agent",
+  "version": "1.0.0",
+  "description": "Standalone agent for Tally Middleware",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "pkg . --targets node18-win-x64 --output exe/agent.exe"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  },
+  "bin": "index.js",
+  "dependencies": {
+    "agentkeepalive": "^4.6.0",
+    "axios": "^1.17.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.4.2",
+    "winston": "^3.19.0",
+    "xml2js": "^0.6.2"
+  }
+}

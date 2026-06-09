@@ -1,0 +1,101 @@
+<mvc:View
+    controllerName="app.tallyapp.controller.Login"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true"
+    height="100%">
+
+    <Page
+        id="loginPage"
+        showHeader="false"
+        enableScrolling="true">
+
+        <HBox
+            justifyContent="Center"
+            alignItems="Center"
+            class="sapUiLargeMarginTop"
+            height="100%">
+
+            <VBox
+                class="responsiveCard sapUiMediumMarginBeginEnd">
+
+                <core:Icon
+                    src="sap-icon://shield"
+                    size="3.5rem"
+                    color="#0070F2"
+                    class="sapUiLargeMarginBottom sapUiLargeMarginTop"/>
+
+                <Title
+                    text="Tally Intelligence Dashboard"
+                    level="H1"
+                    titleStyle="H2"
+                    class="sapUiMediumMarginBottom"
+                    textAlign="Center"/>
+
+                <Text
+                    text="Sign in to access your dashboard"
+                    class="sapUiSmallMarginBottom"
+                    textAlign="Center"/>
+
+                <VBox class="sapUiLargeMarginTop" width="100%">
+
+                    <Label text="Email" labelFor="emailInput" required="true" design="Bold" class="sapUiSmallMarginBottom"/>
+                    <Input
+                        id="emailInput"
+                        type="Email"
+                        placeholder="Enter your email address"
+                        width="100%"
+                        liveChange=".onEmailChange"/>
+                    <Button
+                        id="verifyEmailBtn"
+                        text="Verify"
+                        type="Emphasized"
+                        press=".onVerifyEmail"
+                        width="100%"
+                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+
+                    <Text
+                        id="emailStatusText"
+                        visible="false"
+                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+
+                    <Label text="Password" labelFor="passwordInput" required="true" design="Bold" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                    <Input
+                        id="passwordInput"
+                        type="Password"
+                        placeholder="Enter your password"
+                        width="100%"
+                        enabled="false"
+                        liveChange=".onPasswordChange"/>
+                    <Button
+                        id="loginBtn"
+                        text="Sign In"
+                        type="Emphasized"
+                        press=".onLogin"
+                        enabled="false"
+                        width="100%"
+                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+
+                    <Text
+                        id="passwordStatusText"
+                        visible="false"
+                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+
+                    <BusyIndicator
+                        id="loginBusy"
+                        visible="false"
+                        class="sapUiLargeMarginTop"
+                        size="1.5rem"
+                        text="Please wait..."/>
+
+                </VBox>
+
+            </VBox>
+
+        </HBox>
+
+    </Page>
+
+</mvc:View>
