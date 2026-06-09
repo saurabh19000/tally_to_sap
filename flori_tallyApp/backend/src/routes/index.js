@@ -1,10 +1,7 @@
 const { Router } = require("express");
-const http = require("http");
 const crypto = require("crypto");
 const istTimestamp = require("../helpers/istTimestamp");
-const { getGlobalCreds } = require("./auth");
-
-const TOKEN_PROXY = "localhost:3002";
+const { fetchToken, cpiRequest, pushToCpi } = require("../btpProxy");
 
 let dataVersions = [];
 let versionCounter = 0;
@@ -115,60 +112,24 @@ function addVersion(data) {
     }
 }
 
-function getCredHeaders() {
-    const creds = getGlobalCreds();
-    if (!creds) return {};
-    return {
-        "X-BTP-Client-ID": creds.clientId,
-        "X-BTP-Client-Secret": creds.clientSecret,
-        "X-BTP-Token-Url": creds.tokenUrl,
-        "X-BTP-CPI-Api-Base": creds.cpiApiBase,
-    };
-}
-
-function httpGetWithHeaders(url) {
-    return new Promise(function (resolve) {
-        const credHeaders = getCredHeaders();
-        const opts = new URL(url);
-        const req = http.request(
-            {
-                hostname: opts.hostname,
-                port: opts.port,
-                path: opts.pathname + opts.search,
-                method: "GET",
-                headers: credHeaders,
-            },
-            function (res) {
-                let data = "";
-                res.on("data", (chunk) => (data += chunk));
-                res.on("end", function () {
-                    resolve({ statusCode: res.statusCode, data: data });
-                });
-            }
-        );
-        req.on("error", (err) => resolve({ statusCode: 0, data: "", error: err.message }));
-        req.end();
-    });
-}
-
 function fetchFromCpi(dataStoreId) {
-    return new Promise(function (resolve) {
-        const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
-        httpGetWithHeaders(url).then(function (result) {
-            if (result.error || result.statusCode !== 200) return resolve({ data: [], error: result.error || "HTTP_" + result.statusCode });
-                try { resolve(JSON.parse(result.data || "{}")); } catch (e) { resolve({ data: [], error: "INVALID_JSON" }); }
-        });
+    const extraHeaders = dataStoreId ? { SapDataStoreId: dataStoreId } : {};
+    return cpiRequest("/http/read-tally", "GET", null, extraHeaders).then(function (result) {
+        if (result.status !== 200) return { data: [], error: "HTTP_" + result.status };
+        try { return JSON.parse(result.body || "{}"); } catch (e) { return { data: [], error: "INVALID_JSON" }; }
+    }).catch(function (err) {
+        return { data: [], error: err.message };
     });
 }
 
 function fetchFreshFromCpi(dataStoreId) {
-    return new Promise(function (resolve) {
-        const url = `http://${TOKEN_PROXY}/api/http/read-tally${dataStoreId ? "?storeId=" + encodeURIComponent(dataStoreId) : ""}`;
-        httpGetWithHeaders(url).then(function (result) {
-            const meta = { cpiMessageId: null, status: result.statusCode };
-            if (result.error || result.statusCode !== 200) return resolve({ meta, body: [], error: result.error || "HTTP_" + result.statusCode });
-            try { resolve({ meta, body: JSON.parse(result.data || "[]") }); } catch (e) { resolve({ meta, body: [], error: "JSON_PARSE_ERROR" }); }
-        });
+    const extraHeaders = dataStoreId ? { SapDataStoreId: dataStoreId } : {};
+    return cpiRequest("/http/read-tally", "GET", null, extraHeaders).then(function (result) {
+        const meta = { cpiMessageId: result.cpiMessageId, status: result.status };
+        if (result.status !== 200) return { meta, body: [], error: "HTTP_" + result.status };
+        try { return { meta, body: JSON.parse(result.body || "[]") }; } catch (e) { return { meta, body: [], error: "JSON_PARSE_ERROR" }; }
+    }).catch(function (err) {
+        return { meta: {}, body: [], error: err.message };
     });
 }
 
@@ -228,6 +189,51 @@ router.get("/companies", (req, res) => {
 router.post("/refresh", (req, res) => { const latest = getLatestVersion(req.query.company) || {}; res.json({ success: true, timestamp: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords }); });
 
 router.get("/health", (_req, res) => { const latest = getLatestVersion(_req.query.company) || {}; res.json({ status: "ok", versions: dataVersions.length, lastSync: latest.timestamp, syncId: latest.syncId, records: latest.totalRecords, company: latest.company }); });
+
+router.get("/token", function (req, res) {
+    fetchToken(null).then(function (token) {
+        res.json(token);
+    }).catch(function (err) {
+        res.status(502).json({ error: err.message });
+    });
+});
+
+router.post("/http/tally-write", function (req, res) {
+    const body = JSON.stringify(req.body);
+    const overrides = (req.headers["x-btp-client-id"] && req.headers["x-btp-client-secret"])
+        ? {
+            clientId: req.headers["x-btp-client-id"],
+            clientSecret: req.headers["x-btp-client-secret"],
+            tokenUrl: req.headers["x-btp-token-url"] || process.env.BTP_TOKEN_URL,
+            cpiApiBase: req.headers["x-btp-cpi-api-base"] || process.env.BTP_CPI_API_BASE,
+          }
+        : null;
+
+    pushToCpi(body, overrides).then(function (cpiResult) {
+        let payload;
+        try { payload = JSON.parse(body); } catch (e) { payload = { data: [] }; }
+        const notification = {
+            syncId: cpiResult.cpiMessageId || cpiResult.cpiDataStoreId,
+            cpiMessageId: cpiResult.cpiMessageId,
+            cpiDataStoreId: cpiResult.cpiDataStoreId,
+            cpiPushDate: new Date().toUTCString(),
+            company: payload.company || "—",
+            totalRecords: payload.totalRecords || 0,
+            summary: payload.summary || {},
+            data: payload.data || [],
+            dataType: payload.dataType || "Ledgers",
+        };
+        const version = addVersion(notification);
+        res.json({
+            success: true,
+            cpi: { status: cpiResult.status, messageId: cpiResult.cpiMessageId, dataStoreId: cpiResult.cpiDataStoreId },
+            backend: version || { ingested: false },
+            timestamp: new Date().toUTCString(),
+        });
+    }).catch(function (err) {
+        res.status(502).json({ error: err.message });
+    });
+});
 
 const odataRouter = Router();
 

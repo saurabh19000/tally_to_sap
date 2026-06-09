@@ -1,5 +1,6 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../../.env") });
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const { router, odataRouter } = require("./routes");
 const { authRouter, initAuthDb } = require("./routes/auth");
@@ -12,6 +13,14 @@ app.use(express.json({ limit: "10mb" }));
 app.use("/api", router);
 app.use("/api/auth", authRouter);
 app.use("/odata", odataRouter);
+
+const distPath = path.join(__dirname, "../../dist");
+app.use(express.static(distPath));
+app.get("*", (req, res) => {
+    if (!req.path.startsWith("/api") && !req.path.startsWith("/odata")) {
+        res.sendFile(path.join(distPath, "index.html"));
+    }
+});
 
 // ── AUTO-SYNC ENGINE (Background Worker) ───────────────────────────────────
 const { fetchFreshFromCpi, addVersion, dataVersions } = require("./routes");

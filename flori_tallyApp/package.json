@@ -24,6 +24,7 @@
     "dev": "concurrently --kill-others \"npm run start-proxy\" \"npm run start-backend\" \"npm run start\"",
     "start-local": "ui5 serve --config ./ui5-local.yaml --open \"/index.html?sap-ui-xx-viewCache=false\"",
     "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
+    "start:prod": "node backend/src/server.js",
     "lint": "eslint ./",
     "deploy": "fiori verify",
     "deploy-config": "fiori add deploy-config",

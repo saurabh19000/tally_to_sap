@@ -30,7 +30,7 @@ const CLIENT_ID     = process.env.BTP_CLIENT_ID;
 const CLIENT_SECRET = process.env.BTP_CLIENT_SECRET;
 const TOKEN_URL     = process.env.BTP_TOKEN_URL;
 
-const PROXY_PORT   = 3002;
+const PROXY_PORT   = process.env.PORT || 3002;
 const CPI_API_BASE = process.env.BTP_CPI_API_BASE;
 
 // ── Kill whatever is already on PROXY_PORT ────────────────────────────────────
