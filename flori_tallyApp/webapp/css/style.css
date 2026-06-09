@@ -1,21 +1,235 @@
+/* Responsive Card Styles */
 .responsiveCard {
     width: 100%;
     max-width: 28rem;
 }
-
+.cardShadow {
+    width: 100%;
+    max-width: 28rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.1);
+    background: #ffffff;
+    padding: 1rem;
+}
+.cardShadowLogin {
+    width: 100%;
+    max-width: 28rem;
+    border-radius: 1rem;
+    box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.1);
+    background: #ffffff;
+    padding: 1.5rem;
+}
+/* Metric Tile Styling */
+.metricTile {
+    background: #ffffff;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    min-width: 12rem;
+    flex: 1 1 0;
+    margin: 0.5rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.metricTile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    border-color: #0070F2;
+}
+.metricTile .label {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.metricTile .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1c1c1c;
+}
+/* Search Field Responsive */
 .searchFieldResponsive {
     width: 100%;
     max-width: 22rem;
 }
+/* Toolbar Enhancements */
+.sapMOverflowToolbar {
+    background: #ffffff;
+    border-bottom: 1px solid #e6e9ed;
+}
+/* Table Row Hover Effect */
+.sapMListTblRow:hover {
+    background-color: #f5f7fa;
+    cursor: pointer;
+}
+/* Icon Tab Bar Styling */
+.sapMITBHead {
+    background: #ffffff;
+    border-bottom: 1px solid #e6e9ed;
+}
+.sapMITBSelected .sapMITBFilterIcon {
+    color: #0070F2;
+}
+/* Panel Header Styling */
+.sapMPanelBGHeader {
+    background: #fafbfc;
+}
+/* Button Hover Enhancements */
+.sapMBtn:hover {
+    opacity: 0.9;
+}
+/* Footer Styling */
+.sapMIBar-CTX .sapMBarChild {
+    color: #666;
+}
+/* Status Message Styling */
+.sapMTextStatus {
+    font-size: 0.875rem;
+}
+/* Table Column Header Sticky */
+.sapMListTbl .sapMListTblHeaderCell {
+    background: #f5f7fa;
+    font-weight: 600;
+    border-bottom: 2px solid #d9dde3;
+}
+/* Tab Section Panel Styling */
+.sectionPanel {
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
 
+/* Table Column Header Text */
+.sapMListTbl .sapMListTblHeaderCell {
+    background: #f5f7fa;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #555;
+    border-bottom: 2px solid #d9dde3;
+}
+
+/* Data Value Badge */
+.dataBadge {
+    display: inline-block;
+    background: #eef1f5;
+    border-radius: 0.25rem;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.8rem;
+    color: #444;
+    font-weight: 500;
+}
+
+.dataBadgeSuccess {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.dataBadgeWarning {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.dataBadgeInfo {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+/* Sync ID Styling */
+.syncIdText {
+    font-family: monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+}
+
+/* Summary Footer Styling */
+.summaryFooter {
+    border-top: 1px solid #e6e9ed;
+    background: #fafbfc;
+    padding: 0 0.5rem;
+}
+
+.summaryFooter .sapMLabel {
+    font-size: 0.85rem;
+}
+
+/* Empty State Styling */
+.emptyState {
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+}
+
+/* Tab Filter Icon Active State */
+.sapMITBSelected .sapMITBFilterIcon {
+    color: #0070F2 !important;
+}
+
+/* Table Row Data Styling */
+.sapMListTblCell {
+    font-size: 0.9rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Responsive Media Queries */
 @media screen and (max-width: 480px) {
     .responsiveCard {
         max-width: 100%;
         margin-left: 0.5rem;
         margin-right: 0.5rem;
     }
-
+    .cardShadow {
+        max-width: 100%;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        padding: 0.75rem;
+    }
+    
+    .cardShadowLogin {
+        max-width: 100%;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+        padding: 1rem;
+    }
     .searchFieldResponsive {
         max-width: 100%;
+    }
+    .metricTile {
+        min-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Adjust toolbar for mobile */
+    .sapMOverflowToolbar {
+        padding: 0.25rem 0;
+    }
+    
+    /* Make buttons more touch-friendly on mobile */
+    .sapMBtnInner {
+        min-height: 2.25rem;
+    }
+    
+    /* Adjust table font sizes for mobile */
+    .sapMListTblCell {
+        font-size: 0.875rem;
+    }
+}
+/* Tablet Responsive */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .metricTile {
+        min-width: calc(33% - 1rem);
+    }
+    
+    .searchFieldResponsive {
+        max-width: 16rem;
+    }
+}
+/* Desktop Enhancements */
+@media screen and (min-width: 1200px) {
+    .metricTile {
+        min-width: 12rem;
+    }
+    
+    .cardShadow {
+        max-width: 32rem;
     }
 }

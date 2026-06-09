@@ -3,43 +3,49 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:layout="sap.ui.layout"
     displayBlock="true"
     height="100%">
 
     <Page
         id="loginPage"
         showHeader="false"
-        enableScrolling="true">
+        enableScrolling="true"
+        backgroundDesign="Solid">
 
         <HBox
             justifyContent="Center"
             alignItems="Center"
-            class="sapUiLargeMarginTop"
             height="100%">
 
             <VBox
-                class="responsiveCard sapUiMediumMarginBeginEnd">
+                class="cardShadowLogin sapUiMediumMarginBeginEnd sapUiMediumMarginTopBottom">
 
-                <core:Icon
-                    src="sap-icon://shield"
-                    size="3.5rem"
-                    color="#0070F2"
-                    class="sapUiLargeMarginBottom sapUiLargeMarginTop"/>
+                <!-- App Logo -->
+                <VBox class="sapUiSmallMarginTop" alignItems="Center">
+                    <core:Icon
+                        src="sap-icon://building"
+                        size="3rem"
+                        color="#0070F2"
+                        class="sapUiSmallMarginBottom"/>
+                    <Title
+                        text="TALLY INTELLIGENCE"
+                        level="H2"
+                        titleStyle="H2"
+                        class="sapUiTinyMarginBottom"
+                        textAlign="Center"/>
+                    <Title
+                        text="Dashboard"
+                        level="H1"
+                        titleStyle="H1"
+                        class="sapUiTinyMarginBottom"
+                        textAlign="Center"/>
+                    <Text
+                        text="Powered by SAP BTP"
+                        class="sapUiSmallMarginBottom"
+                        textAlign="Center"/>
+                </VBox>
 
-                <Title
-                    text="Tally Intelligence Dashboard"
-                    level="H1"
-                    titleStyle="H2"
-                    class="sapUiMediumMarginBottom"
-                    textAlign="Center"/>
-
-                <Text
-                    text="Sign in to access your dashboard"
-                    class="sapUiSmallMarginBottom"
-                    textAlign="Center"/>
-
-                <VBox class="sapUiLargeMarginTop" width="100%">
+                <VBox class="sapUiMediumMarginTop sapUiLargeMarginBottom" width="100%">
 
                     <Label text="Email" labelFor="emailInput" required="true" design="Bold" class="sapUiSmallMarginBottom"/>
                     <Input
@@ -54,14 +60,14 @@
                         type="Emphasized"
                         press=".onVerifyEmail"
                         width="100%"
-                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+                        class="sapUiTinyMarginTop"/>
 
                     <Text
                         id="emailStatusText"
                         visible="false"
                         class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
 
-                    <Label text="Password" labelFor="passwordInput" required="true" design="Bold" class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                    <Label text="Password" labelFor="passwordInput" required="true" design="Bold" class="sapUiLargeMarginTop sapUiSmallMarginBottom"/>
                     <Input
                         id="passwordInput"
                         type="Password"
@@ -76,21 +82,27 @@
                         press=".onLogin"
                         enabled="false"
                         width="100%"
-                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+                        class="sapUiTinyMarginTop"/>
 
                     <Text
                         id="passwordStatusText"
                         visible="false"
                         class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
 
-                    <BusyIndicator
-                        id="loginBusy"
-                        visible="false"
-                        class="sapUiLargeMarginTop"
-                        size="1.5rem"
-                        text="Please wait..."/>
-
                 </VBox>
+
+                <!-- Footer text -->
+                <Text
+                    text="Secure access to Tally data"
+                    class="sapUiSmallMarginBottom"
+                    textAlign="Center"/>
+
+                <BusyIndicator
+                    id="loginBusy"
+                    visible="false"
+                    class="sapUiMediumMarginBottom"
+                    size="1.5rem"
+                    text="Please wait..."/>
 
             </VBox>
 

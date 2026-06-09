@@ -11,9 +11,10 @@ sap.ui.define([
         onInit: function () {
             var token = localStorage.getItem("tallyAuthToken");
             if (!token) {
-                UIComponent.getRouterFor(this).navTo("Login");
+                UIComponent.getRouterFor(this).navTo("Login", {}, true);
                 return;
             }
+            this._updateSaveButton();
             var that = this;
             fetch("/api/auth/credentials?token=" + encodeURIComponent(token))
                 .then(function (r) { return r.json(); })
@@ -97,7 +98,7 @@ sap.ui.define([
             var token = localStorage.getItem("tallyAuthToken");
             if (!token) {
                 MessageBox.error("Session expired. Please login again.");
-                UIComponent.getRouterFor(this).navTo("Login");
+                UIComponent.getRouterFor(this).navTo("Login", {}, true);
                 return;
             }
 
@@ -127,7 +128,7 @@ sap.ui.define([
                     var dbMsg = data.dbPersisted ? "Saved to database." : "Saved in memory only (DB unavailable).";
                     MessageBox.success("Credentials saved successfully!\n\n" + dbMsg + "\n\nRedirecting to dashboard...", {
                         onClose: function () {
-                            UIComponent.getRouterFor(that.getView()).navTo("RouteView1");
+                            UIComponent.getRouterFor(that.getView()).navTo("RouteView1", {}, true);
                         }
                     });
                 } else {
@@ -159,7 +160,7 @@ sap.ui.define([
             var clientSecret = this.byId("clientSecretInput").getValue().trim();
             var tokenUrl = this.byId("tokenUrlInput").getValue().trim();
             var cpiApiBase = this.byId("cpiBaseInput").getValue().trim();
-            this.byId("saveCredsBtn").setEnabled(clientId && clientSecret && tokenUrl && cpiApiBase);
+            this.byId("saveCredsBtn").setEnabled(!!(clientId && clientSecret && tokenUrl && cpiApiBase));
         },
 
         _setBusy: function (busy) {

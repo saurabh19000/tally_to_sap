@@ -15,9 +15,10 @@
 
         <customHeader>
             <OverflowToolbar>
+                <!-- Dashboard Header Logo -->
                 <core:Icon
-                    src="sap-icon://document"
-                    size="1.4rem"
+                    src="sap-icon://building"
+                    size="1.6rem"
                     color="#0070F2"
                     class="sapUiSmallMarginEnd"/>
                 <Title
@@ -25,19 +26,24 @@
                     level="H2"
                     titleStyle="H4"/>
                 <ToolbarSpacer/>
+                <!-- Company Context Selector -->
                 <Select 
                     id="companySelect" 
                     items="{/companies}" 
                     selectedKey="{/selectedCompany}" 
                     change=".onCompanyChange"
                     class="sapUiSmallMarginEnd"
-                    tooltip="Select Company Context">
+                    tooltip="Select Company Context"
+                    width="auto"
+                    maxWidth="200px">
                     <core:Item key="{key}" text="{text}" />
                 </Select>
+                <!-- Last Refreshed Status -->
                 <Label
                     text="{/lastRefreshed}"
                     design="Bold"
                     class="sapUiSmallMarginEnd"/>
+                <!-- Action Buttons -->
                 <Button
                     id="fetchBtpBtn"
                     text="Fetch from BTP"
@@ -49,7 +55,7 @@
                 <Button
                     id="syncBtn"
                     text="Refresh UI"
-                    icon="sap-icon://refresh"
+                    icon="sap-icon://synchronize"
                     type="Emphasized"
                     press=".onRefresh"
                     tooltip="Refresh current dashboard data"/>
@@ -72,27 +78,24 @@
 
         <content>
 
+            <!-- Data Source Summary Panel -->
             <Panel
                 id="headerPanel"
                 backgroundDesign="Solid"
-                class="sapUiSmallMargin">
+                class="sapUiSmallMargin sapUiShadowLevel1">
 
                 <headerToolbar>
                     <Toolbar height="3rem">
                         <core:Icon
                             src="sap-icon://business-objects-experience"
                             size="1rem"
+                            color="#0070F2"
                             class="sapUiSmallMarginEnd"/>
                         <Title
                             text="Data Source Summary"
                             level="H3"
                             titleStyle="H5"/>
                         <ToolbarSpacer/>
-                        <ObjectStatus
-                            text="Manual Refresh"
-                            state="Success"
-                            icon="sap-icon://connected"
-                            inverted="true"/>
                     </Toolbar>
                 </headerToolbar>
 
@@ -102,38 +105,39 @@
                     alignItems="Center"
                     class="sapUiSmallMargin">
 
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Latest Sync Company" design="Bold" class="sapUiTinyMarginBottom"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Latest Sync Company" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/company}" state="Information" icon="sap-icon://home"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Ledgers" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/totalLedgers}" state="Success" icon="sap-icon://ledger"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Ledgers" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/totalLedgers}" state="Success" icon="sap-icon://account"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Vouchers" design="Bold" class="sapUiTinyMarginBottom"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Vouchers" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/totalVouchers}" state="Warning" icon="sap-icon://receipt"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Stock Items" design="Bold" class="sapUiTinyMarginBottom"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Stock Items" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/totalStockItems}" state="Error" icon="sap-icon://product"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
-                        <Label text="Total System Records" design="Bold" class="sapUiTinyMarginBottom"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Total System Records" class="sapUiTinyMarginBottom"/>
                         <ObjectStatus text="{/totalRecords}" state="None" icon="sap-icon://database"/>
                     </VBox>
 
-                    <VBox class="sapUiSmallMarginBottom">
-                        <Label text="Latest Sync ID" design="Bold" class="sapUiTinyMarginBottom"/>
-                        <ObjectStatus text="{/syncId}" state="None" icon="sap-icon://message-id"/>
+                    <VBox class="metricTile sapUiSmallMarginBottom">
+                        <Label text="Latest Sync ID" class="sapUiTinyMarginBottom"/>
+                        <ObjectStatus text="{/syncId}" state="None"/>
                     </VBox>
                 </HBox>
             </Panel>
 
+            <!-- Tab Bar for Data Views -->
             <IconTabBar
                 id="tabBar"
                 class="sapUiSmallMarginBeginEnd"
@@ -142,8 +146,9 @@
                 selectedKey="{/tab}">
 
                 <items>
+                    <!-- Sync History Tab -->
                     <IconTabFilter key="SyncHistory" text="Sync History" icon="sap-icon://history">
-                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin sapUiShadowLevel1">
                             <headerToolbar>
                                 <Toolbar>
                                     <core:Icon src="sap-icon://list" size="1rem" class="sapUiSmallMarginEnd"/>
@@ -171,12 +176,12 @@
                                 selectionChange=".onSyncSelect">
 
                                 <columns>
-                                    <Column width="15%"><Text text="Version ID"/></Column>
+                                    <Column width="15%" minScreenWidth="Tablet"><Text text="Version ID"/></Column>
                                     <Column width="30%"><Text text="Sync ID (BTP)"/></Column>
-                                    <Column width="15%"><Text text="Company"/></Column>
-                                    <Column width="15%"><Text text="Data Type"/></Column>
-                                    <Column width="10%" hAlign="End"><Text text="Records"/></Column>
-                                    <Column width="15%" hAlign="Center"><Text text="Pushed At"/></Column>
+                                    <Column width="15%" minScreenWidth="Tablet"><Text text="Company"/></Column>
+                                    <Column width="15%" minScreenWidth="Tablet"><Text text="Data Type"/></Column>
+                                    <Column width="10%" hAlign="End" minScreenWidth="Tablet"><Text text="Records"/></Column>
+                                    <Column width="15%" hAlign="Center" minScreenWidth="Tablet"><Text text="Pushed At"/></Column>
                                 </columns>
 
                                 <items>
@@ -193,11 +198,12 @@
                         </Panel>
                     </IconTabFilter>
 
-                    <IconTabFilter key="Ledgers" text="Ledgers" icon="sap-icon://ledger">
-                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                    <!-- Ledgers Tab -->
+                    <IconTabFilter key="Ledgers" text="Ledgers" icon="sap-icon://account">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin sapUiShadowLevel1">
                             <headerToolbar>
                                 <Toolbar>
-                                    <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
+                                    <core:Icon src="sap-icon://shield" size="1rem" color="#0070F2" class="sapUiSmallMarginEnd"/>
                                     <Title text="Ledger Register" level="H3" titleStyle="H6"/>
                                     <ToolbarSpacer/>
                                     <SearchField
@@ -222,11 +228,11 @@
 
                                 <columns>
                                     <Column width="15%"><Text text="Ledger Name"/></Column>
-                                    <Column width="12%"><Text text="Parent Group"/></Column>
-                                    <Column width="10%"><Text text="GSTIN"/></Column>
+                                    <Column width="12%" minScreenWidth="Tablet"><Text text="Parent Group"/></Column>
+                                    <Column width="10%" minScreenWidth="Tablet"><Text text="GSTIN"/></Column>
                                     <Column width="10%" hAlign="End"><Text text="Closing"/></Column>
-                                    <Column width="12%" hAlign="Center"><Text text="Sync Date"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
+                                    <Column width="12%" hAlign="Center" minScreenWidth="Tablet"><Text text="Sync Date"/></Column>
+                                    <Column width="8%" hAlign="Center" minScreenWidth="Phone"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
@@ -252,8 +258,9 @@
                         </Panel>
                     </IconTabFilter>
 
+                    <!-- Vouchers Tab -->
                     <IconTabFilter key="Vouchers" text="Vouchers" icon="sap-icon://receipt">
-                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin sapUiShadowLevel1">
                             <headerToolbar>
                                 <Toolbar>
                                     <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
@@ -280,13 +287,13 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="10%"><Text text="Date"/></Column>
+                                    <Column width="10%" minScreenWidth="Tablet"><Text text="Date"/></Column>
                                     <Column width="11%"><Text text="Voucher Type"/></Column>
-                                    <Column width="8%"><Text text="No."/></Column>
+                                    <Column width="8%" minScreenWidth="Tablet"><Text text="No."/></Column>
                                     <Column width="12%"><Text text="Party Name"/></Column>
-                                    <Column width="13%"><Text text="Narration"/></Column>
+                                    <Column width="13%" minScreenWidth="Tablet"><Text text="Narration"/></Column>
                                     <Column width="12%" hAlign="End"><Text text="Amount"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
+                                    <Column width="8%" hAlign="Center" minScreenWidth="Phone"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
@@ -311,8 +318,9 @@
                         </Panel>
                     </IconTabFilter>
 
+                    <!-- Stock Items Tab -->
                     <IconTabFilter key="StockItems" text="Stock Items" icon="sap-icon://inventory">
-                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin">
+                        <Panel backgroundDesign="Solid" class="sapUiSmallMargin sapUiShadowLevel1">
                             <headerToolbar>
                                 <Toolbar>
                                     <core:Icon src="sap-icon://table-chart" size="1rem" class="sapUiSmallMarginEnd"/>
@@ -340,13 +348,13 @@
 
                                 <columns>
                                     <Column width="15%"><Text text="Stock Name"/></Column>
-                                    <Column width="10%"><Text text="Category"/></Column>
+                                    <Column width="10%" minScreenWidth="Tablet"><Text text="Category"/></Column>
                                     <Column width="8%" hAlign="End"><Text text="Rate"/></Column>
                                     <Column width="8%" hAlign="End"><Text text="Qty"/></Column>
-                                    <Column width="8%"><Text text="Unit"/></Column>
+                                    <Column width="8%" minScreenWidth="Tablet"><Text text="Unit"/></Column>
                                     <Column width="10%" hAlign="End"><Text text="Amount"/></Column>
-                                    <Column width="13%" hAlign="Center"><Text text="Sync Date"/></Column>
-                                    <Column width="8%" hAlign="Center"><Text text="Details"/></Column>
+                                    <Column width="13%" hAlign="Center" minScreenWidth="Tablet"><Text text="Sync Date"/></Column>
+                                    <Column width="8%" hAlign="Center" minScreenWidth="Phone"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
@@ -379,8 +387,8 @@
         <footer>
             <Bar design="Footer">
                 <contentLeft>
-                    <core:Icon src="sap-icon://shield" color="#107E3E"/>
-                    <Label text="  Connected · Tally Backend Service" design="Bold" class="sapUiSmallMarginBegin"/>
+                    <core:Icon src="sap-icon://building" color="#0070F2"/>
+                    <Label text="  Tally Intelligence · Powered by SAP BTP" design="Bold" class="sapUiSmallMarginBegin"/>
                 </contentLeft>
                 <contentRight>
                     <Label text="Tally Intelligence Dashboard · INR · India"/>

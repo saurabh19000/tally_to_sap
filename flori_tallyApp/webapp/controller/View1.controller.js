@@ -248,7 +248,13 @@ sap.ui.define([
         },
 
         onGoToCredentials: function () {
-            UIComponent.getRouterFor(this).navTo("Credentials");
+            console.log("[View1] BTP Settings clicked, navigating to Credentials...");
+            var router = UIComponent.getRouterFor(this);
+            if (router) {
+                router.navTo("Credentials");
+            } else {
+                console.error("[View1] Router not found!");
+            }
         },
 
         onLogout: function () {
@@ -261,7 +267,7 @@ sap.ui.define([
                 }).catch(function () {});
             }
             localStorage.removeItem("tallyAuthToken");
-            UIComponent.getRouterFor(this).navTo("Login");
+            UIComponent.getRouterFor(this).navTo("Login", {}, true);
         },
 
         onFetchBtp: function () {

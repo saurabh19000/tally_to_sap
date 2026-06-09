@@ -25,13 +25,13 @@ sap.ui.define([
                             .then(function (r) { return r.json(); })
                             .then(function (cData) {
                                 if (cData.configured) {
-                                    UIComponent.getRouterFor(that.getView()).navTo("RouteView1");
+                                    UIComponent.getRouterFor(that.getView()).navTo("RouteView1", {}, true);
                                 } else {
-                                    UIComponent.getRouterFor(that.getView()).navTo("Credentials");
+                                    UIComponent.getRouterFor(that.getView()).navTo("Credentials", {}, true);
                                 }
                             })
                             .catch(function () {
-                                UIComponent.getRouterFor(that.getView()).navTo("Credentials");
+                                UIComponent.getRouterFor(that.getView()).navTo("Credentials", {}, true);
                             });
                     } else {
                         localStorage.removeItem("tallyAuthToken");
@@ -136,10 +136,10 @@ sap.ui.define([
                     localStorage.setItem("tallyAuthToken", data.token);
                     if (data.credentialsConfigured) {
                         MessageToast.show("Login successful! Stored credentials loaded.");
-                        UIComponent.getRouterFor(that.getView()).navTo("RouteView1");
+                        UIComponent.getRouterFor(that.getView()).navTo("RouteView1", {}, true);
                     } else {
                         MessageToast.show("Login successful! Please configure your BTP credentials.");
-                        UIComponent.getRouterFor(that.getView()).navTo("Credentials");
+                        UIComponent.getRouterFor(that.getView()).navTo("Credentials", {}, true);
                     }
                 } else {
                     that._setPasswordStatus("Error", data.message);
