@@ -23,11 +23,6 @@ async function pushAllToBtpMethod(ledgers, vouchers, items, company, config) {
   };
 
   const payloadSize = JSON.stringify(payload).length;
-  log(`Payload size: ${(payloadSize / 1024 / 1024).toFixed(2)} MB`);
-
-  if (payloadSize > 40 * 1024 * 1024) {
-    log('Warning: Payload exceeds 40MB, may hit server limits.');
-  }
 
   try {
     const res = await axios.post(`${BACKEND_URL}/api/btp/push/all`, payload, {
@@ -38,6 +33,15 @@ async function pushAllToBtpMethod(ledgers, vouchers, items, company, config) {
     });
 
     log('Backend API responded successfully.');
+    
+    if (res.data && res.data.ok === false) {
+      const errors = res.data.errors || res.data.results?.errors;
+      const errorMsg = Array.isArray(errors) && errors.length > 0 
+        ? errors.join(', ') 
+        : (res.data.error || res.data.results?.error || 'Unknown backend error');
+      throw new Error(`Push Failed: ${errorMsg}`);
+    }
+
     return res.data;
   } catch (err) {
     const status = err.response?.status ? `(HTTP ${err.response.status})` : '';

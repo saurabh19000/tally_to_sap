@@ -958,7 +958,7 @@ router.post("/btp/push/all", async (req, res) => {
     clearTokenCache();
   }
 
-  return res.json({ ok: results.errors.length === 0, results, btpRes });
+  return res.json({ ok: results.errors.length === 0, results, btpRes, errors: results.errors });
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
