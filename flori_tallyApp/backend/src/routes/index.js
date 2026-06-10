@@ -262,39 +262,83 @@ odataRouter.get("/v4/tally/Syncs", (req, res) => {
 
 odataRouter.get("/v4/tally/Ledgers", (req, res) => {
     let seen = {}; let ledgers = [];
-    const targetSyncId = req.query.syncId || (getLatestVersion(req.query.company) ? getLatestVersion(req.query.company).syncId : null);
+    const companyFilter = req.query.company;
+    const targetSyncId = req.query.syncId;
 
-    console.log(`[odata] Fetching Ledgers for SyncID: ${targetSyncId}`);
-
-    if (targetSyncId) {
-        const targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
-        console.log(`[odata] Found ${targetVersions.length} versions matching SyncID`);
-
-        for (let i = targetVersions.length - 1; i >= 0; i--) {
-            const v = targetVersions[i];
-            const type = (v.dataType || "").toLowerCase();
-            if (type !== "ledgers" && type !== "tallydata" && type !== "all") continue;
-            
-            (v.data || []).forEach((d, idx) => {
-                // Identify a Ledger by checking for properties unique to its structure.
-                const isLedger = d.parentGroup !== undefined || d.openingBalance !== undefined;
-                
-                if (isLedger) {
-                    // Robust deduplication key: use GUID or Name|Group, fallback to index to avoid merging unnamed records
-                    const key = d.guid || (d.name ? (d.name + "|" + (d.parentGroup || "")) : ("unnamed-" + idx));
-                    if (!seen[key]) { 
-                        seen[key] = true; 
-                        ledgers.push(Object.assign({}, d, { 
-                            syncId: v.cpiMessageId || v.syncId || "—", 
-                            syncDate: v.timestamp 
-                        })); 
-                    }
-                }
-            });
+    let targetVersions = [];
+    if (companyFilter) {
+        targetVersions = dataVersions.filter(v => v.company === companyFilter);
+    } else if (targetSyncId) {
+        // Find the company for this syncId first, then get all versions for that company
+        const syncVersion = dataVersions.find(v => v.syncId === targetSyncId);
+        if (syncVersion && syncVersion.company) {
+            targetVersions = dataVersions.filter(v => v.company === syncVersion.company);
+        } else {
+            targetVersions = dataVersions.filter(v => v.syncId === targetSyncId);
         }
+    } else {
+        const latest = getLatestVersion();
+        if (latest) targetVersions = dataVersions.filter(v => v.company === latest.company);
     }
-    console.log(`[odata] Returning ${ledgers.length} ledgers`);
-    res.json({ value: ledgers.sort((a, b) => (a.name || "").localeCompare(b.name || "")) });
+
+    console.log(`[debug-odata] Fetching Ledgers. Company: ${companyFilter}, Sync: ${targetSyncId}. Versions: ${targetVersions.length}`);
+
+    targetVersions.forEach(v => {
+        (v.data || []).forEach((d, idx) => {
+            // DIAGNOSTIC: Log the keys of the first record if we still can't find names
+            if (idx === 0) console.log(`[debug-odata] Sample Keys:`, Object.keys(d));
+
+            // 1. Resolve Name - Aggressive Search
+            const rawName = d.name || d.ledgerName || d.LedgerName || d.partyName || d.PartyName || d.stockName || d.Alias || d.ledger || d.Ledger || "";
+            const rawGroup = d.parentGroup || d.group || d.ParentGroup || d.Group || "";
+
+            const isLedgerMaster = d.parentGroup !== undefined || d.openingBalance !== undefined || d.closingBalance !== undefined;
+            const entries = d.ledgerEntries || d.InventoryEntries || d.inventoryEntries || d.LedgerEntries || [];
+
+            // Master Record
+            if (isLedgerMaster) {
+                const finalName = rawName || (rawGroup ? ("[" + rawGroup + "]") : "Unnamed Ledger");
+                const key = (finalName + "|" + rawGroup).toLowerCase();
+
+                if (!seen[key]) {
+                    seen[key] = true;
+                    var rawGstin = d.gstin || d.GSTIN || d.gstNo || d.GstNo || d.gstNumber || d.GstNumber || d.gstRegistration || d.GstRegistration || "";
+                    ledgers.push(Object.assign({}, d, {
+                        name: finalName,
+                        parentGroup: rawGroup,
+                        gstin: rawGstin,
+                        syncId: v.cpiMessageId || v.syncId || "—",
+                        syncDate: v.timestamp
+                    }));
+                }
+            }
+
+            // Extraction from Vouchers
+            if (Array.isArray(entries)) {
+                entries.forEach(ent => {
+                    const entName = ent.name || ent.ledgerName || ent.LedgerName || ent.partyName || ent.PartyName;
+                    if (entName) {
+                        const key = (entName + "|").toLowerCase();
+                        if (!seen[key]) {
+                            seen[key] = true;
+                            ledgers.push({
+                                name: entName,
+                                parentGroup: "Extracted from Vouchers",
+                                closingBalance: ent.amount || 0,
+                                type: "Voucher Entry",
+                                syncId: v.cpiMessageId || v.syncId || "—",
+                                syncDate: v.timestamp
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    ledgers.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    console.log(`[debug-odata] Returning ${ledgers.length} ledgers`);
+    res.json({ value: ledgers });
 });
 
 odataRouter.get("/v4/tally/Vouchers", (req, res) => {

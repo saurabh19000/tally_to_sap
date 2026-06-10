@@ -91,6 +91,8 @@ sap.ui.define([
 
                     // Step 2: Fetch data for the identified sync
                     var q = "?syncId=" + encodeURIComponent(targetSyncId);
+                    if (selectedCompany) q += "&company=" + encodeURIComponent(selectedCompany);
+
                     return Promise.all([
                         Promise.resolve(syncResult),
                         fetch(CAP_URL + "/Ledgers" + q).then(r => r.json()),
@@ -108,9 +110,14 @@ sap.ui.define([
                     var currentSyncId = specificSyncId || (syncs.length > 0 ? syncs[0].syncId : null);
                     var latest = syncs.find(s => s.syncId === currentSyncId) || syncs[0] || {};
 
+                // Remove extracted-from-voucher entries — only show real ledger masters
+                var realLedgers = ledgers.filter(function (l) {
+                    return l.parentGroup !== "Extracted from Vouchers";
+                });
+
                 // Update Master Model with ALL data
                 oModel.setProperty("/syncs",        syncs);
-                oModel.setProperty("/ledgers",      ledgers);
+                oModel.setProperty("/ledgers",      realLedgers);
                 oModel.setProperty("/vouchers",     vouchers);
                 oModel.setProperty("/stockItems",   stockItems);
 
@@ -357,6 +364,11 @@ sap.ui.define([
 
         formatBool: function (v) {
             return v ? "Yes" : "No";
+        },
+
+        formatLedgerEntries: function (v) {
+            if (!v || !Array.isArray(v)) return "";
+            return v.map(function (e) { return e.ledgerName || e.LedgerName || e.name || ""; }).filter(Boolean).join(", ");
         }
     });
 });

@@ -227,12 +227,12 @@
                                 mode="None">
 
                                 <columns>
-                                    <Column width="15%"><Text text="Ledger Name"/></Column>
-                                    <Column width="12%" minScreenWidth="Tablet"><Text text="Parent Group"/></Column>
-                                    <Column width="10%" minScreenWidth="Tablet"><Text text="GSTIN"/></Column>
-                                    <Column width="10%" hAlign="End"><Text text="Closing"/></Column>
-                                    <Column width="12%" hAlign="Center" minScreenWidth="Tablet"><Text text="Sync Date"/></Column>
-                                    <Column width="8%" hAlign="Center" minScreenWidth="Phone"><Text text="Details"/></Column>
+                                    <Column width="24%"><Text text="Ledger Name"/></Column>
+                                    <Column width="18%"><Text text="Parent Group"/></Column>
+                                    <Column width="16%"><Text text="GSTIN"/></Column>
+                                    <Column width="15%" hAlign="End"><Text text="Closing"/></Column>
+                                    <Column width="17%" hAlign="Center"><Text text="Sync Date"/></Column>
+                                    <Column width="10%" hAlign="Center"><Text text="Details"/></Column>
                                 </columns>
 
                                 <items>
@@ -291,7 +291,8 @@
                                     <Column width="11%"><Text text="Voucher Type"/></Column>
                                     <Column width="8%" minScreenWidth="Tablet"><Text text="No."/></Column>
                                     <Column width="12%"><Text text="Party Name"/></Column>
-                                    <Column width="13%" minScreenWidth="Tablet"><Text text="Narration"/></Column>
+                                    <Column width="16%" minScreenWidth="Tablet"><Text text="Ledger Entries"/></Column>
+                                    <Column width="10%" minScreenWidth="Tablet"><Text text="Narration"/></Column>
                                     <Column width="12%" hAlign="End"><Text text="Amount"/></Column>
                                     <Column width="8%" hAlign="Center" minScreenWidth="Phone"><Text text="Details"/></Column>
                                 </columns>
@@ -302,6 +303,7 @@
                                         <Label text="{voucherType}" design="Bold"/>
                                         <Text text="{voucherNumber}" wrapping="false"/>
                                         <ObjectIdentifier title="{partyName}" titleActive="false"/>
+                                        <Text text="{path: 'ledgerEntries', formatter: '.formatLedgerEntries'}" wrapping="false" maxLines="2"/>
                                         <Text text="{narration}" wrapping="false" maxLines="1"/>
                                         <ObjectNumber number="{path: 'netAmount', formatter: '.formatBalance'}" state="{path: 'netAmount', formatter: '.formatBalanceState'}" emphasized="true"/>
                                         <Button icon="sap-icon://hint" type="Transparent" press=".onViewDetails" tooltip="View all dynamic fields"/>

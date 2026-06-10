@@ -1,8 +1,13 @@
+/* =====================================================
+   BASE STYLES
+   ===================================================== */
+
 /* Responsive Card Styles */
 .responsiveCard {
     width: 100%;
     max-width: 28rem;
 }
+
 .cardShadow {
     width: 100%;
     max-width: 28rem;
@@ -11,6 +16,7 @@
     background: #ffffff;
     padding: 1rem;
 }
+
 .cardShadowLogin {
     width: 100%;
     max-width: 28rem;
@@ -19,7 +25,11 @@
     background: #ffffff;
     padding: 1.5rem;
 }
-/* Metric Tile Styling */
+
+/* =====================================================
+   METRIC TILES
+   ===================================================== */
+
 .metricTile {
     background: #ffffff;
     border-radius: 0.5rem;
@@ -31,212 +41,348 @@
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+
 .metricTile:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
     border-color: #0070F2;
 }
+
 .metricTile .label {
     font-size: 0.75rem;
     color: #666;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 .metricTile .value {
     font-size: 1.25rem;
     font-weight: 700;
     color: #1c1c1c;
 }
-/* Search Field Responsive */
+
+/* =====================================================
+   SEARCH & TOOLBAR
+   ===================================================== */
+
 .searchFieldResponsive {
     width: 100%;
     max-width: 22rem;
 }
-/* Toolbar Enhancements */
+
 .sapMOverflowToolbar {
     background: #ffffff;
     border-bottom: 1px solid #e6e9ed;
 }
-/* Table Row Hover Effect */
+
+/* =====================================================
+   CLEAN TABLE STYLES - THE FIX
+   ===================================================== */
+
+/* Main Table - Simple border */
+.sapMListTbl {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    overflow: auto !important;
+    background: #ffffff !important;
+}
+
+/* Table Header - Clean gray, NO gradients */
+.sapMListTbl .sapMListTblHeaderCell {
+    background: #f8f9fa !important;
+    color: #374151 !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    padding: 12px 8px !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.sapMListTbl .sapMListTblHeaderCell .sapMLabel {
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+
+/* Alternating Row Colors - Very subtle */
+.sapMListTblRowOdd {
+    background-color: #ffffff !important;
+}
+
+.sapMListTblRowEven {
+    background-color: #fafafa !important;
+}
+
+/* Row Hover Effect - Subtle blue */
 .sapMListTblRow:hover {
-    background-color: #f5f7fa;
+    background-color: #f0f9ff !important;
     cursor: pointer;
 }
-/* Icon Tab Bar Styling */
-.sapMITBHead {
-    background: #ffffff;
-    border-bottom: 1px solid #e6e9ed;
-}
-.sapMITBSelected .sapMITBFilterIcon {
-    color: #0070F2;
-}
-/* Panel Header Styling */
-.sapMPanelBGHeader {
-    background: #fafbfc;
-}
-/* Button Hover Enhancements */
-.sapMBtn:hover {
-    opacity: 0.9;
-}
-/* Footer Styling */
-.sapMIBar-CTX .sapMBarChild {
-    color: #666;
-}
-/* Status Message Styling */
-.sapMTextStatus {
-    font-size: 0.875rem;
-}
-/* Table Column Header Sticky */
-.sapMListTbl .sapMListTblHeaderCell {
-    background: #f5f7fa;
-    font-weight: 600;
-    border-bottom: 2px solid #d9dde3;
-}
-/* Tab Section Panel Styling */
-.sectionPanel {
-    border-radius: 0.5rem;
-    overflow: hidden;
+
+/* Selected Row */
+.sapMListTblRowSelected {
+    background-color: #e0f2fe !important;
 }
 
-/* Table Column Header Text */
-.sapMListTbl .sapMListTblHeaderCell {
-    background: #f5f7fa;
-    font-weight: 600;
-    font-size: 0.8rem;
-    color: #555;
-    border-bottom: 2px solid #d9dde3;
+/* Cell Styling - Clean spacing */
+.sapMListTblCell {
+    padding: 10px 8px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    font-size: 0.85rem !important;
+    color: #4b5563 !important;
 }
 
-/* Data Value Badge */
+/* First column slightly bolder */
+.sapMListTblCell:first-child {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+/* =====================================================
+   DATA BADGES
+   ===================================================== */
+
 .dataBadge {
     display: inline-block;
-    background: #eef1f5;
+    background: #f3f4f6;
     border-radius: 0.25rem;
     padding: 0.15rem 0.5rem;
-    font-size: 0.8rem;
-    color: #444;
+    font-size: 0.75rem;
+    color: #4b5563;
     font-weight: 500;
 }
 
 .dataBadgeSuccess {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: #d1fae5;
+    color: #065f46;
 }
 
 .dataBadgeWarning {
-    background: #fff3e0;
-    color: #e65100;
+    background: #fed7aa;
+    color: #92400e;
 }
 
 .dataBadgeInfo {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: #dbeafe;
+    color: #1e40af;
 }
 
 /* Sync ID Styling */
 .syncIdText {
     font-family: monospace;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     letter-spacing: 0.3px;
 }
 
-/* Summary Footer Styling */
-.summaryFooter {
-    border-top: 1px solid #e6e9ed;
-    background: #fafbfc;
-    padding: 0 0.5rem;
+/* =====================================================
+   GSTIN STYLING
+   ===================================================== */
+
+.gstin-badge {
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: #4b5563;
+    display: inline-block;
 }
 
-.summaryFooter .sapMLabel {
+.gstin-empty {
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 11px;
+}
+
+/* =====================================================
+   NUMERIC VALUES
+   ===================================================== */
+
+.numeric-positive {
+    color: #059669;
+    font-weight: 600;
+}
+
+.numeric-negative {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.numeric-zero {
+    color: #6b7280;
+}
+
+/* =====================================================
+   ACTION BUTTONS
+   ===================================================== */
+
+.table-action-btn {
+    background: transparent !important;
+    border: none !important;
+    padding: 4px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+}
+
+.table-action-btn:hover {
+    background: #f3f4f6 !important;
+    border-radius: 4px !important;
+}
+
+/* =====================================================
+   SUMMARY CARDS - SIMPLE, NO GRADIENTS
+   ===================================================== */
+
+.summary-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    flex: 1;
+    min-width: 160px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.summary-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.summary-card-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.summary-card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.summary-card-unit {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-left: 4px;
+}
+
+/* =====================================================
+   DATA SOURCE PANEL
+   ===================================================== */
+
+.data-source-panel {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border: 1px solid #e5e7eb;
+}
+
+.data-source-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.data-source-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.data-source-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.data-source-item-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.data-source-item-value {
     font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
 }
 
-/* Empty State Styling */
-.emptyState {
-    padding: 2rem;
-    text-align: center;
-    color: #999;
+.sync-id-value {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 2px 8px;
+    border-radius: 4px;
 }
 
-/* Tab Filter Icon Active State */
-.sapMITBSelected .sapMITBFilterIcon {
-    color: #0070F2 !important;
+/* =====================================================
+   TABLE FOOTER
+   ===================================================== */
+
+.table-footer-summary {
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-/* Table Row Data Styling */
-.sapMListTblCell {
+.total-records {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.total-records strong {
+    color: #374151;
     font-size: 0.9rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
 }
 
-/* Responsive Media Queries */
-@media screen and (max-width: 480px) {
-    .responsiveCard {
-        max-width: 100%;
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
-    }
-    .cardShadow {
-        max-width: 100%;
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
-        padding: 0.75rem;
-    }
-    
-    .cardShadowLogin {
-        max-width: 100%;
-        margin-left: 0.5rem;
-        margin-right: 0.5rem;
-        padding: 1rem;
-    }
-    .searchFieldResponsive {
-        max-width: 100%;
-    }
-    .metricTile {
-        min-width: 100%;
-        margin-bottom: 0.5rem;
-    }
-    
-    /* Adjust toolbar for mobile */
-    .sapMOverflowToolbar {
-        padding: 0.25rem 0;
-    }
-    
-    /* Make buttons more touch-friendly on mobile */
-    .sapMBtnInner {
-        min-height: 2.25rem;
-    }
-    
-    /* Adjust table font sizes for mobile */
-    .sapMListTblCell {
-        font-size: 0.875rem;
-    }
+.powered-by {
+    font-size: 0.75rem;
+    color: #9ca3af;
 }
-/* Tablet Responsive */
-@media screen and (min-width: 481px) and (max-width: 768px) {
-    .metricTile {
-        min-width: calc(33% - 1rem);
-    }
-    
-    .searchFieldResponsive {
-        max-width: 16rem;
-    }
+
+/* =====================================================
+   PANEL STYLES
+   ===================================================== */
+
+.sectionPanel {
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
-/* Desktop Enhancements */
-@media screen and (min-width: 1200px) {
-    .metricTile {
-        min-width: 12rem;
-    }
-    
-    .cardShadow {
-        max-width: 32rem;
-    }
+
+.sapMPanelBGHeader {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.summaryFooter {
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+    padding: 0 0.5rem;
 }
 
 /* =====================================================
    LOGIN PAGE
-===================================================== */
+   ===================================================== */
 
 .loginPage {
     background: #f5f7fa;
@@ -249,44 +395,23 @@
     box-sizing: border-box;
 }
 
-/* =====================================================
-   MAIN CONTAINER
-===================================================== */
-
 .loginContainer {
     width: 1100px;
     max-width: 95%;
-    height: 700px; /* Fixed height to prevent increasing size */
-
+    height: 700px;
     background: #ffffff;
-
     border-radius: 24px;
-
     overflow: hidden;
-
     display: flex;
-
-    box-shadow:
-        0 10px 20px rgba(0,0,0,0.06),
-        0 20px 60px rgba(0,0,0,0.12);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.06), 0 20px 60px rgba(0,0,0,0.12);
 }
 
-/* =====================================================
-   LEFT PANEL
-===================================================== */
-
+/* Left Panel */
 .brandingPanel {
     width: 45%;
     min-width: 420px;
-
-    background: linear-gradient(
-        180deg,
-        #0A6ED1 0%,
-        #0854A0 100%
-    );
-
+    background: linear-gradient(180deg, #0A6ED1 0%, #0854A0 100%);
     padding: 4rem 3rem;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -311,17 +436,13 @@
     margin-top: 1rem;
 }
 
-/* =====================================================
-   RIGHT PANEL
-===================================================== */
-
+/* Right Panel */
 .loginPanel {
     width: 55%;
-    padding: 5rem 5rem 2rem 5rem; /* Increased top padding to maintain visual center */
-
+    padding: 5rem 5rem 2rem 5rem;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Changed from center to prevent shifting */
+    justify-content: flex-start;
 }
 
 .loginFormContainer {
@@ -329,10 +450,6 @@
     max-width: 600px;
     margin: 0 auto;
 }
-
-/* =====================================================
-   HEADER
-===================================================== */
 
 .loginPanel .sapMTitle {
     font-weight: 700;
@@ -343,10 +460,6 @@
     color: #6b7280;
 }
 
-/* =====================================================
-   LABELS
-===================================================== */
-
 .loginPanel .sapMLabel {
     font-size: 1rem;
     font-weight: 600;
@@ -354,31 +467,19 @@
     margin-bottom: 0.5rem;
 }
 
-/* =====================================================
-   INPUTS
-===================================================== */
-
 .loginPanel .sapMInputBase {
     width: 100%;
-    height: 52px !important; /* Fixed height for the control */
+    height: 52px !important;
     margin-top: 0.4rem;
 }
-
-/* Larger input */
 
 .loginPanel .sapMInputBaseInner {
     height: 52px !important;
     padding-left: 14px !important;
     padding-right: 14px !important;
-
     font-size: 1rem !important;
-
     border-radius: 10px !important;
 }
-
-/* =====================================================
-   BUTTONS
-===================================================== */
 
 .loginPanel .sapMBtn {
     width: 100%;
@@ -389,12 +490,10 @@
     border-radius: 10px !important;
     font-size: 1rem !important;
     font-weight: 600 !important;
-
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 }
-
 
 #verifyEmailBtn {
     margin-top: 1rem;
@@ -403,10 +502,6 @@
 #loginBtn {
     margin-top: 1.5rem;
 }
-
-/* =====================================================
-   STATUS TEXT
-===================================================== */
 
 #emailStatusText {
     width: 100%;
@@ -417,10 +512,6 @@
     margin-top: 0.5rem;
 }
 
-/* =====================================================
-   FOOTER
-===================================================== */
-
 .footerText {
     text-align: center;
     color: #6b7280;
@@ -429,47 +520,8 @@
 }
 
 /* =====================================================
-   MOBILE
-===================================================== */
-
-@media screen and (max-width: 768px) {
-
-    .loginWrapper {
-        padding: 1rem;
-    }
-
-    .loginContainer {
-        flex-direction: column;
-        width: 100%;
-        min-height: auto;
-    }
-
-    .brandingPanel {
-        width: 100%;
-        min-width: auto;
-        min-height: 220px;
-        padding: 2rem;
-    }
-
-    .loginPanel {
-        width: 100%;
-        padding: 2rem;
-    }
-
-    .brandingTitle {
-        font-size: 1.8rem !important;
-    }
-
-    .loginPanel .sapMInputBaseInner {
-        height: 48px !important;
-    }
-
-    .loginPanel .sapMBtnInner {
-        height: 48px !important;
-        line-height: 48px !important;
-    }
-}
-/* Fix SAPUI5 Input Alignment */
+   FIXES
+   ===================================================== */
 
 .sapMInputBaseInner {
     height: 2.75rem !important;
@@ -488,15 +540,105 @@
 
 .emailStatusMessage {
     display: block !important;
-
     margin-top: 0.75rem !important;
     margin-bottom: 1.25rem !important;
-
     font-size: 0.9rem;
     line-height: 1.4rem;
-
     color: #d32f2f;
-
     white-space: normal !important;
     word-break: break-word;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media screen and (max-width: 480px) {
+    .responsiveCard, .cardShadow, .cardShadowLogin {
+        max-width: 100%;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+    
+    .cardShadow { padding: 0.75rem; }
+    .cardShadowLogin { padding: 1rem; }
+    .searchFieldResponsive { max-width: 100%; }
+    
+    .metricTile {
+        min-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sapMListTblCell {
+        font-size: 0.75rem !important;
+        padding: 8px 4px !important;
+    }
+    
+    .summary-card {
+        min-width: 100%;
+    }
+    
+    .summary-cards-container {
+        flex-direction: column;
+    }
+    
+    .loginContainer {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .brandingPanel, .loginPanel {
+        width: 100%;
+        padding: 2rem;
+    }
+    
+    .brandingPanel {
+        min-width: auto;
+        min-height: 200px;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .metricTile {
+        min-width: calc(33% - 1rem);
+    }
+    
+    .searchFieldResponsive {
+        max-width: 16rem;
+    }
+    
+    .summary-card {
+        min-width: calc(33% - 16px);
+    }
+}
+
+/* Remove all gradients - keep it professional! */
+.sapMListTbl .sapMListTblHeaderCell {
+    background: #f8f9fa !important; /* Simple gray, no gradient */
+    color: #374151 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* No orange borders */
+.sapMListTbl .sapMListTblHeaderCell {
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* No colorful gradients on summary cards */
+.summary-card {
+    background: #ffffff !important;
+    color: inherit !important;
+}
+
+.summary-card-value {
+    color: #1f2937 !important;
+}
+
+.summary-card-label {
+    color: #6b7280 !important;
+}
+
+/* Remove left gap from ledger table */
+#ledgerTable .sapMListTblCell:first-child {
+    padding-left: 0 !important;
 }
