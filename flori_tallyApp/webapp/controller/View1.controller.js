@@ -133,10 +133,10 @@ sap.ui.define([
                     : "—");
 
                 // Calculate Global System Statistics
-                oModel.setProperty("/totalLedgers",    ledgers.length);
+                oModel.setProperty("/totalLedgers",    realLedgers.length);
                 oModel.setProperty("/totalVouchers",   vouchers.length);
                 oModel.setProperty("/totalStockItems", stockItems.length);
-                oModel.setProperty("/totalRecords",    ledgers.length + vouchers.length + stockItems.length);
+                oModel.setProperty("/totalRecords",    realLedgers.length + vouchers.length + stockItems.length);
 
                 oModel.setProperty("/lastRefreshed",
                     "Last refreshed: " + new Date().toLocaleTimeString("en-IN"));
