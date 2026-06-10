@@ -9,65 +9,110 @@
     <Page
         id="loginPage"
         showHeader="false"
-        enableScrolling="true"
-        backgroundDesign="Solid">
+        enableScrolling="false"
+        class="loginPage">
 
         <HBox
+            class="loginWrapper"
             justifyContent="Center"
             alignItems="Center"
             height="100%">
 
-            <VBox
-                class="cardShadowLogin sapUiMediumMarginBeginEnd sapUiMediumMarginTopBottom">
+            <!-- Main Login Card -->
+            <HBox
+                class="loginContainer"
+                renderType="Bare">
 
-                <!-- App Logo -->
-                <VBox class="sapUiSmallMarginTop" alignItems="Center">
+                <!-- LEFT BRANDING PANEL -->
+                <VBox
+                    class="brandingPanel"
+                    justifyContent="Center"
+                    alignItems="Center">
+
                     <core:Icon
                         src="sap-icon://building"
-                        size="3rem"
-                        color="#0070F2"
-                        class="sapUiSmallMarginBottom"/>
+                        size="5rem"
+                        color="white"
+                        class="sapUiMediumMarginBottom"/>
+
                     <Title
-                        text="TALLY INTELLIGENCE"
+                        text="Tally Intelligence Dashboard"
                         level="H2"
-                        titleStyle="H2"
-                        class="sapUiTinyMarginBottom"
-                        textAlign="Center"/>
-                    <Title
-                        text="Dashboard"
-                        level="H1"
-                        titleStyle="H1"
-                        class="sapUiTinyMarginBottom"
-                        textAlign="Center"/>
+                        class="brandingTitle"/>
+
                     <Text
-                        text="Powered by SAP BTP"
-                        class="sapUiSmallMarginBottom"
-                        textAlign="Center"/>
+                        text="Real-time Tally analytics and SAP BTP integration"
+                        class="brandingSubtitle"/>
+
                 </VBox>
 
-                <VBox class="sapUiMediumMarginTop sapUiLargeMarginBottom" width="100%">
+                <!-- RIGHT LOGIN PANEL -->
+                <VBox class="loginPanel">
 
-                    <Label text="Email" labelFor="emailInput" required="true" design="Bold" class="sapUiSmallMarginBottom"/>
+                    <!-- Logo & Heading -->
+                    <VBox
+                        alignItems="Center"
+                        class="sapUiLargeMarginBottom">
+
+                        <core:Icon
+                            src="sap-icon://building"
+                            size="3rem"
+                            color="#0A6ED1"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <Title
+                            text="TALLY INTELLIGENCE"
+                            level="H2"
+                            textAlign="Center"/>
+
+                        <Text
+                            text="Powered by SAP BTP"
+                            textAlign="Center"/>
+
+                    </VBox>
+
+                    <!-- EMAIL -->
+
+                    <Label
+                        text="Email"
+                        required="true"
+                        labelFor="emailInput"/>
+
                     <Input
                         id="emailInput"
                         type="Email"
                         placeholder="Enter your email address"
                         width="100%"
                         liveChange=".onEmailChange"/>
-                    <Button
-                        id="verifyEmailBtn"
-                        text="Verify"
-                        type="Emphasized"
-                        press=".onVerifyEmail"
-                        width="100%"
-                        class="sapUiTinyMarginTop"/>
 
-                    <Text
-                        id="emailStatusText"
-                        visible="false"
-                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+                    <VBox width="100%">
 
-                    <Label text="Password" labelFor="passwordInput" required="true" design="Bold" class="sapUiLargeMarginTop sapUiSmallMarginBottom"/>
+    <Button
+        id="verifyEmailBtn"
+        text="Verify"
+        type="Emphasized"
+        width="100%"
+        press=".onVerifyEmail"/>
+
+    <!-- Reserved space for status to prevent layout shift -->
+    <VBox height="70px" justifyContent="Center">
+        <MessageStrip
+            id="emailStatusText"
+            visible="false"
+            showIcon="true"
+            showCloseButton="false"/>
+    </VBox>
+
+</VBox>
+
+                    <!-- PASSWORD -->
+    
+                    <Label
+                        text="Password"
+                        required="true"
+                        labelFor="passwordInput"
+                        class="sapUiLargeMarginTop"/>
+
                     <Input
                         id="passwordInput"
                         type="Password"
@@ -75,6 +120,7 @@
                         width="100%"
                         enabled="false"
                         liveChange=".onPasswordChange"/>
+
                     <Button
                         id="loginBtn"
                         text="Sign In"
@@ -82,32 +128,30 @@
                         press=".onLogin"
                         enabled="false"
                         width="100%"
-                        class="sapUiTinyMarginTop"/>
+                        class="sapUiMediumMarginTop"/>
 
                     <Text
                         id="passwordStatusText"
                         visible="false"
-                        class="sapUiTinyMarginTop sapUiSmallMarginBottom"/>
+                        class="sapUiSmallMarginTop"/>
+
+                    <Text
+                        text="Secure access to Tally data"
+                        class="footerText sapUiLargeMarginTop"/>
+
+                    <BusyIndicator
+                        id="loginBusy"
+                        visible="false"
+                        text="Please wait..."
+                        size="1.5rem"
+                        class="sapUiMediumMarginTop"/>
 
                 </VBox>
 
-                <!-- Footer text -->
-                <Text
-                    text="Secure access to Tally data"
-                    class="sapUiSmallMarginBottom"
-                    textAlign="Center"/>
-
-                <BusyIndicator
-                    id="loginBusy"
-                    visible="false"
-                    class="sapUiMediumMarginBottom"
-                    size="1.5rem"
-                    text="Please wait..."/>
-
-            </VBox>
+            </HBox>
 
         </HBox>
 
     </Page>
 
-</mvc:View>
+</mvc:View> 

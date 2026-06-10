@@ -146,15 +146,36 @@ sap.ui.define([
             });
         },
 
-        _setEmailStatus: function (state, text) {
-            var oText = this.byId("emailStatusText");
-            if (!text) {
-                oText.setVisible(false);
-                return;
-            }
-            oText.setText(text);
-            oText.setVisible(true);
-        },
+        _setEmailStatus: function (sType, sMessage) {
+
+    var oStatus = this.byId("emailStatusText");
+
+    if (!sMessage) {
+        oStatus.setVisible(false);
+        return;
+    }
+
+    oStatus.setVisible(true);
+    oStatus.setText(sMessage);
+
+    switch (sType) {
+
+        case "Error":
+            oStatus.setType("Error");
+            break;
+
+        case "Success":
+            oStatus.setType("Success");
+            break;
+
+        case "Warning":
+            oStatus.setType("Warning");
+            break;
+
+        default:
+            oStatus.setType("Information");
+    }
+},
 
         _setPasswordStatus: function (state, text) {
             var oText = this.byId("passwordStatusText");

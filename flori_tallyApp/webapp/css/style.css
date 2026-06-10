@@ -233,3 +233,270 @@
         max-width: 32rem;
     }
 }
+
+/* =====================================================
+   LOGIN PAGE
+===================================================== */
+
+.loginPage {
+    background: #f5f7fa;
+}
+
+.loginWrapper {
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+/* =====================================================
+   MAIN CONTAINER
+===================================================== */
+
+.loginContainer {
+    width: 1100px;
+    max-width: 95%;
+    height: 700px; /* Fixed height to prevent increasing size */
+
+    background: #ffffff;
+
+    border-radius: 24px;
+
+    overflow: hidden;
+
+    display: flex;
+
+    box-shadow:
+        0 10px 20px rgba(0,0,0,0.06),
+        0 20px 60px rgba(0,0,0,0.12);
+}
+
+/* =====================================================
+   LEFT PANEL
+===================================================== */
+
+.brandingPanel {
+    width: 45%;
+    min-width: 420px;
+
+    background: linear-gradient(
+        180deg,
+        #0A6ED1 0%,
+        #0854A0 100%
+    );
+
+    padding: 4rem 3rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.brandingTitle {
+    color: #ffffff !important;
+    text-align: center;
+    font-size: 2.2rem !important;
+    font-weight: 700 !important;
+    line-height: 2.8rem;
+    margin-top: 1rem;
+}
+
+.brandingSubtitle {
+    color: rgba(255,255,255,0.9) !important;
+    text-align: center;
+    font-size: 1.05rem;
+    line-height: 1.8rem;
+    max-width: 340px;
+    margin-top: 1rem;
+}
+
+/* =====================================================
+   RIGHT PANEL
+===================================================== */
+
+.loginPanel {
+    width: 55%;
+    padding: 5rem 5rem 2rem 5rem; /* Increased top padding to maintain visual center */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Changed from center to prevent shifting */
+}
+
+.loginFormContainer {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.loginPanel .sapMTitle {
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.loginPanel .sapMText {
+    color: #6b7280;
+}
+
+/* =====================================================
+   LABELS
+===================================================== */
+
+.loginPanel .sapMLabel {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.loginPanel .sapMInputBase {
+    width: 100%;
+    height: 52px !important; /* Fixed height for the control */
+    margin-top: 0.4rem;
+}
+
+/* Larger input */
+
+.loginPanel .sapMInputBaseInner {
+    height: 52px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+
+    font-size: 1rem !important;
+
+    border-radius: 10px !important;
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.loginPanel .sapMBtn {
+    width: 100%;
+}
+
+.loginPanel .sapMBtnInner {
+    height: 3rem !important;
+    border-radius: 10px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+
+#verifyEmailBtn {
+    margin-top: 1rem;
+}
+
+#loginBtn {
+    margin-top: 1.5rem;
+}
+
+/* =====================================================
+   STATUS TEXT
+===================================================== */
+
+#emailStatusText {
+    width: 100%;
+}
+
+#passwordStatusText {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.footerText {
+    text-align: center;
+    color: #6b7280;
+    margin-top: 2rem;
+    font-size: 1rem;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media screen and (max-width: 768px) {
+
+    .loginWrapper {
+        padding: 1rem;
+    }
+
+    .loginContainer {
+        flex-direction: column;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .brandingPanel {
+        width: 100%;
+        min-width: auto;
+        min-height: 220px;
+        padding: 2rem;
+    }
+
+    .loginPanel {
+        width: 100%;
+        padding: 2rem;
+    }
+
+    .brandingTitle {
+        font-size: 1.8rem !important;
+    }
+
+    .loginPanel .sapMInputBaseInner {
+        height: 48px !important;
+    }
+
+    .loginPanel .sapMBtnInner {
+        height: 48px !important;
+        line-height: 48px !important;
+    }
+}
+/* Fix SAPUI5 Input Alignment */
+
+.sapMInputBaseInner {
+    height: 2.75rem !important;
+    line-height: 2.75rem !important;
+    padding: 0 0.75rem !important;
+    box-sizing: border-box !important;
+}
+
+.sapMInputBaseContentWrapper {
+    height: auto !important;
+}
+
+.sapMInputBase {
+    height: auto !important;
+}
+
+.emailStatusMessage {
+    display: block !important;
+
+    margin-top: 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+
+    font-size: 0.9rem;
+    line-height: 1.4rem;
+
+    color: #d32f2f;
+
+    white-space: normal !important;
+    word-break: break-word;
+}
